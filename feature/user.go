@@ -39,11 +39,13 @@ func UserRegiset(c *gin.Context) {
 			Name:     name,
 			IsFollow: false,
 			Token:    Token,
+			V_key:    count + 1,
 		})
+
 		c.JSON(http.StatusOK, UserLR{
 			StatusCode: 0,
 			StatusMsg:  "注册成功！",
-			UserID:     1,
+			UserID:     count + 1,
 			Token:      Token,
 		})
 	}

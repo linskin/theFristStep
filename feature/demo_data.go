@@ -1,11 +1,13 @@
 package feature
 
-var DemoAuthor = S_Author{
-	ID:            1,
+var DemoAuthor = User{
+	ID:            3,
 	Name:          "SWAG",
 	FollowCount:   19,
 	FollowerCount: 9999,
 	IsFollow:      true,
+	Token:         "NSWAGP123456",
+	V_key:         3,
 }
 
 /*
@@ -22,11 +24,20 @@ var DemoVideo = []Video{
 	{
 		ID:            1,
 		Author:        DemoAuthor,
-		PlayURL:       "http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4",
+		PlayURL:       "http://192.168.1.102:9090/Dazhuojun.mp4",
 		CoverURL:      "https://img0.baidu.com/it/u=3294539948,324399065&fm=253&fmt=auto&app=138&f=JPEG?w=822&h=500",
 		FavoriteCount: 999,
 		CommentCount:  2,
 		IsFavorite:    false,
 		Title:         "amazing movie!",
+	},
+}
+
+var DemoComment = []Comment{
+	{
+		ID:         3,
+		User:       DemoAuthor,
+		Content:    "会场厉害!!!太像肖酱",
+		CreateDate: "2023-2-9",
 	},
 }
