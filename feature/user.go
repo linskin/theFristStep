@@ -87,7 +87,7 @@ func ShowUser(c *gin.Context) {
 	defer db.Close()
 	db.AutoMigrate(&User{})
 	var u User
-	db.Where("Token = ?", Token).Find(&u)
+	db.Where("Token = ?", Token).First(&u)
 	c.JSON(http.StatusOK, UserInfo{
 		StatusCode: 0,
 		StatusMsg:  "个人信息",
