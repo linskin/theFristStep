@@ -13,7 +13,7 @@ import (
 var K_CMap sync.Map //用来判断用户是否离线，并且存储每个对话窗口对应的conn
 
 func MassageServe() {
-	listen, err := net.Listen("tcp", "192.168.1.102:9090")
+	listen, err := net.Listen("tcp", ":9090")
 	if err != nil {
 		panic(err)
 	}

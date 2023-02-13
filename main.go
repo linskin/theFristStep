@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"example.com/m/v2/feature"
 	"example.com/m/v2/serve"
 	"github.com/gin-gonic/gin"
@@ -34,10 +32,11 @@ func initRouter(r *gin.Engine) {
 }
 
 func main() {
-	fmt.Println("hello")
 	go serve.MassageServe()
 	r := gin.Default()
 	initRouter(r)
 
-	r.Run("192.168.1.102:8080")
+	if err := r.Run(":8080"); err != nil {
+		panic(err)
+	}
 }
