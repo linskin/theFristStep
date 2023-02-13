@@ -9,13 +9,14 @@ import (
 // 使用者不需要管连接的创建和关闭。
 var DB *gorm.DB
 
-func init() {
+func InitDB() {
 	dsn := "remote:guoyixing@(119.23.244.10)/douyin?charset=utf8mb4&parseTime=True&Local"
-	db, err := gorm.Open("mysql", dsn)
+	var err error
+	DB, err = gorm.Open("mysql", dsn)
 	if err != nil {
 		panic(err)
 	}
-	sqlDB := db.DB()
+	sqlDB := DB.DB()
 	sqlDB.SetMaxIdleConns(10)  //总是存活连接数
 	sqlDB.SetMaxOpenConns(200) //最大连接数
 }

@@ -9,7 +9,6 @@ import (
 func Feed(C *gin.Context) {
 	DB.AutoMigrate(&Video{}, &User{})
 	var VL []Video
-
 	DB.Table("videos").Find(&VL)
 	for i, V := range VL {
 		key := V.UID

@@ -35,7 +35,7 @@ func main() {
 	go serve.MassageServe()
 	r := gin.Default()
 	initRouter(r)
-
+	feature.InitDB()
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}
