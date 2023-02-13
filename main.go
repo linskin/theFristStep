@@ -1,10 +1,19 @@
 package main
 
 import (
+	"example.com/m/v2/conf"
 	"example.com/m/v2/feature"
 	"example.com/m/v2/serve"
 	"github.com/gin-gonic/gin"
 )
+
+func init() {
+	//初始化数据库配置
+	conf.InitDB()
+	//初始化对象存储配置
+	conf.InitCos()
+
+}
 
 func initRouter(r *gin.Engine) {
 	apiRouter := r.Group("/douyin")
@@ -35,7 +44,6 @@ func main() {
 	go serve.MassageServe()
 	r := gin.Default()
 	initRouter(r)
-	feature.InitDB()
 	if err := r.Run(":8080"); err != nil {
 		panic(err)
 	}

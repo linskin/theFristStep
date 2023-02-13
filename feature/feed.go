@@ -1,19 +1,20 @@
 package feature
 
 import (
+	"example.com/m/v2/conf"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 )
 
 func Feed(C *gin.Context) {
-	DB.AutoMigrate(&Video{}, &User{})
+	conf.DB.AutoMigrate(&Video{}, &User{})
 	var VL []Video
-	DB.Table("videos").Find(&VL)
+	conf.DB.Table("videos").Find(&VL)
 	for i, V := range VL {
 		key := V.UID
 		var u User
-		DB.Table("users").Where("v_key = ?", key).Last(&u)
+		conf.DB.Table("users").Where("v_key = ?", key).Last(&u)
 		VL[i].Author = u
 		// fmt.Println(u)
 		// fmt.Println(VL[i])

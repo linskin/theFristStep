@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"example.com/m/v2/conf"
 	"net/http"
 	"time"
 
@@ -12,10 +13,10 @@ func FavoriteActon(c *gin.Context) {
 
 	vid := c.Query("video_id")
 	var v Video
-	DB.AutoMigrate(&User{}, &Video{})
-	DB.Table("videos").Where("id = ?", vid).First(&v)
+	conf.DB.AutoMigrate(&User{}, &Video{})
+	conf.DB.Table("videos").Where("id = ?", vid).First(&v)
 	Likenum := v.FavoriteCount + 1
-	DB.Model(&v).Update(Video{FavoriteCount: Likenum})
+	conf.DB.Model(&v).Update(Video{FavoriteCount: Likenum})
 	c.JSON(http.StatusOK, LikeAction{
 		StatusCode: 0,
 		StatusMsg:  "string",

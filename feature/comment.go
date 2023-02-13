@@ -1,6 +1,7 @@
 package feature
 
 import (
+	"example.com/m/v2/conf"
 	"net/http"
 	"strconv"
 	"time"
@@ -11,16 +12,16 @@ import (
 
 func ShowComment(c *gin.Context) {
 
-	DB.AutoMigrate(&User{}, &Video{}, &Comment{})
+	conf.DB.AutoMigrate(&User{}, &Video{}, &Comment{})
 	vid := c.Query("video_id")
 	num, _ := strconv.Atoi(vid)
 	var comments []Comment
-	DB.Table("comments").Where("Vid = ?", num).Find(&comments)
+	conf.DB.Table("comments").Where("Vid = ?", num).Find(&comments)
 	l := len(comments)
-	DB.Table("videos").Where("id = ?", num).Update("comment_count", l)
+	conf.DB.Table("videos").Where("id = ?", num).Update("comment_count", l)
 	for i, cm := range comments {
 		var u_cm User
-		DB.Table("users").Where("id = ?", cm.Uid).Find(&u_cm)
+		conf.DB.Table("users").Where("id = ?", cm.Uid).Find(&u_cm)
 		comments[i].User = u_cm
 	}
 	c.JSON(http.StatusOK, CommentResponse{
@@ -31,11 +32,11 @@ func ShowComment(c *gin.Context) {
 }
 
 func CommentAction(c *gin.Context) {
-	DB.AutoMigrate(&User{}, &Video{}, &Comment{})
+	conf.DB.AutoMigrate(&User{}, &Video{}, &Comment{})
 	Token := c.Query("token")
 	var com Comment
 	var u User
-	DB.Table("users").Where("token = ?", Token).First(&u)
+	conf.DB.Table("users").Where("token = ?", Token).First(&u)
 	Action_type := c.Query("action_type")
 	vid := c.Query("video_id")
 	num, _ := strconv.Atoi(vid)
@@ -49,7 +50,7 @@ func CommentAction(c *gin.Context) {
 			Vid:        num,
 			Uid:        u.ID,
 		}
-		DB.Table("comments").Create(&com)
+		conf.DB.Table("comments").Create(&com)
 		//DB.Table("videos").Where("id = ?",num).Update("")
 		c.JSON(http.StatusOK, Commentaction{
 			StatusCode: 0,
@@ -60,7 +61,7 @@ func CommentAction(c *gin.Context) {
 	}
 	c_id := c.Query("comment_id")
 	cid, _ := strconv.Atoi(c_id)
-	DB.Table("comments").Where("id = ?", cid).First(&com)
-	DB.Table("comments").Delete(&com)
+	conf.DB.Table("comments").Where("id = ?", cid).First(&com)
+	conf.DB.Table("comments").Delete(&com)
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
 }
