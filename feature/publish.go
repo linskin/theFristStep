@@ -35,7 +35,6 @@ func PublishList(c *gin.Context) {
 func PublishAction(c *gin.Context) {
 	Token := c.PostForm("token")
 	T := c.PostForm("title")
-
 	var u User
 	result := conf.DB.Table("users").Where("Token = ?", Token).Find(&u)
 	if result.Error != nil {

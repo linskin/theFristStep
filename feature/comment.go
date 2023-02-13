@@ -33,25 +33,31 @@ func ShowComment(c *gin.Context) {
 
 func CommentAction(c *gin.Context) {
 	conf.DB.AutoMigrate(&User{}, &Video{}, &Comment{})
-	Token := c.Query("token")
+
+	//获取请求参数
+	token := c.Query("token")            //token
+	actionType := c.Query("action_type") //1评论 2删除评论
+	vid := c.Query("video_id")
+	num, _ := strconv.Atoi(vid) //视频id
+
 	var com Comment
 	var u User
-	conf.DB.Table("users").Where("token = ?", Token).First(&u)
-	Action_type := c.Query("action_type")
-	vid := c.Query("video_id")
-	num, _ := strconv.Atoi(vid)
-	if Action_type == "1" {
-		c_text := c.Query("comment_text")
+	conf.DB.Table("users").Where("token = ?", token).First(&u)
+
+	if actionType == "1" {
+		//新增评论
+		cText := c.Query("comment_text")
 		com = Comment{
-			ID:         3,
 			User:       u,
-			Content:    c_text,
-			CreateDate: time.RubyDate,
+			Content:    cText,
+			CreateDate: time.Now().Format("2006-01-02 15:04:05"),
 			Vid:        num,
 			Uid:        u.ID,
 		}
+		//插入数据库
 		conf.DB.Table("comments").Create(&com)
-		//DB.Table("videos").Where("id = ?",num).Update("")
+		//更新视频评论数
+		conf.DB.Exec("update videos set comment_count = comment_count+1 where id = ?", num)
 		c.JSON(http.StatusOK, Commentaction{
 			StatusCode: 0,
 			StatusMsg:  "success",
@@ -59,9 +65,12 @@ func CommentAction(c *gin.Context) {
 		})
 		return
 	}
-	c_id := c.Query("comment_id")
-	cid, _ := strconv.Atoi(c_id)
-	conf.DB.Table("comments").Where("id = ?", cid).First(&com)
-	conf.DB.Table("comments").Delete(&com)
+	//删除评论
+	cID := c.Query("comment_id")
+	cid, _ := strconv.Atoi(cID)
+	//删除评论记录
+	conf.DB.Table("comments").Delete(&Comment{}, cid)
+	//减少视频评论数
+	conf.DB.Exec("update videos set comment_count = comment_count-1 where id = ?", num)
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
 }
