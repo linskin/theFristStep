@@ -1,6 +1,7 @@
-package conf
+package feature
 
 import (
+	"example.com/m/v2/conf"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,11 +12,13 @@ var DB *gorm.DB
 
 func InitDB() {
 	var err error
-	DB, err = gorm.Open("mysql", DSN)
+	DB, err = gorm.Open("mysql", conf.DSN)
 	if err != nil {
 		panic(err)
 	}
 	sqlDB := DB.DB()
 	sqlDB.SetMaxIdleConns(10)  //总是存活连接数
 	sqlDB.SetMaxOpenConns(200) //最大连接数
+	DB.AutoMigrate(&User{}, &Favorite{}, &Video{}, &Comment{},
+		&Follow{}, Message{})
 }

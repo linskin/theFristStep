@@ -1,7 +1,6 @@
 package feature
 
 import (
-	"example.com/m/v2/conf"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,16 +11,16 @@ import (
 
 func ShowComment(c *gin.Context) {
 
-	conf.DB.AutoMigrate(&User{}, &Video{}, &Comment{})
+	DB.AutoMigrate(&User{}, &Video{}, &Comment{})
 	vid := c.Query("video_id")
 	num, _ := strconv.Atoi(vid)
 	var comments []Comment
-	conf.DB.Table("comments").Where("Vid = ?", num).Find(&comments)
+	DB.Table("comments").Where("Vid = ?", num).Find(&comments)
 	l := len(comments)
-	conf.DB.Table("videos").Where("id = ?", num).Update("comment_count", l)
+	DB.Table("videos").Where("id = ?", num).Update("comment_count", l)
 	for i, cm := range comments {
 		var u_cm User
-		conf.DB.Table("users").Where("id = ?", cm.Uid).Find(&u_cm)
+		DB.Table("users").Where("id = ?", cm.Uid).Find(&u_cm)
 		comments[i].User = u_cm
 	}
 	c.JSON(http.StatusOK, CommentResponse{
@@ -32,7 +31,7 @@ func ShowComment(c *gin.Context) {
 }
 
 func CommentAction(c *gin.Context) {
-	conf.DB.AutoMigrate(&User{}, &Video{}, &Comment{})
+	DB.AutoMigrate(&User{}, &Video{}, &Comment{})
 
 	//获取请求参数
 	token := c.Query("token")            //token
@@ -42,7 +41,7 @@ func CommentAction(c *gin.Context) {
 
 	var com Comment
 	var u User
-	conf.DB.Table("users").Where("token = ?", token).First(&u)
+	DB.Table("users").Where("token = ?", token).First(&u)
 
 	if actionType == "1" {
 		//新增评论
@@ -55,9 +54,9 @@ func CommentAction(c *gin.Context) {
 			Uid:        u.ID,
 		}
 		//插入数据库
-		conf.DB.Table("comments").Create(&com)
+		DB.Table("comments").Create(&com)
 		//更新视频评论数
-		conf.DB.Exec("update videos set comment_count = comment_count+1 where id = ?", num)
+		DB.Exec("update videos set comment_count = comment_count+1 where id = ?", num)
 		c.JSON(http.StatusOK, Commentaction{
 			StatusCode: 0,
 			StatusMsg:  "success",
@@ -69,8 +68,8 @@ func CommentAction(c *gin.Context) {
 	cID := c.Query("comment_id")
 	cid, _ := strconv.Atoi(cID)
 	//删除评论记录
-	conf.DB.Table("comments").Delete(&Comment{}, cid)
+	DB.Table("comments").Delete(&Comment{}, cid)
 	//减少视频评论数
-	conf.DB.Exec("update videos set comment_count = comment_count-1 where id = ?", num)
+	DB.Exec("update videos set comment_count = comment_count-1 where id = ?", num)
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
 }

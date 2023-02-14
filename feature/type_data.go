@@ -31,7 +31,6 @@ type User struct {
 	FollowerCount int    `json:"follower_count" gorm:"default:0"`
 	IsFollow      bool   `json:"is_follow"`
 	Token         string `json:"-"`
-	V_key         int    `json:"-" gorm:"ForeignKey"`
 }
 
 type Video struct {
@@ -91,6 +90,12 @@ type Follow struct {
 	Id   int
 	Uid  int `gorm:"column:Uid"`
 	TUid int `gorm:"column:TUid"`
+}
+
+type Favorite struct {
+	ID      int
+	UserID  int
+	VideoID int
 }
 
 // 消息

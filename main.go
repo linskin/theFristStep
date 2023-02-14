@@ -1,7 +1,6 @@
 package main
 
 import (
-	"example.com/m/v2/conf"
 	"example.com/m/v2/feature"
 	"example.com/m/v2/serve"
 	"github.com/gin-gonic/gin"
@@ -9,9 +8,9 @@ import (
 
 func init() {
 	//初始化数据库配置
-	conf.InitDB()
+	feature.InitDB()
 	//初始化对象存储配置
-	conf.InitCos()
+	feature.InitCos()
 
 }
 

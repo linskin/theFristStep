@@ -1,7 +1,6 @@
 package feature
 
 import (
-	"example.com/m/v2/conf"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -20,16 +19,16 @@ var Num_Message sync.Map
 
 func MessageAction(c *gin.Context) {
 
-	conf.DB.AutoMigrate(&Message{})
+	DB.AutoMigrate(&Message{})
 	a_t := c.Query("action_type")
 	text := c.Query("content")
 	Token := c.Query("token")
 	var u User
-	conf.DB.Table("users").Where("token = ?", Token).First(&u)
+	DB.Table("users").Where("token = ?", Token).First(&u)
 	S_Tuid := c.Query("to_user_id")
 	Tuid, _ := strconv.Atoi(S_Tuid)
 	K := GetKey(u.ID, Tuid)
-	conf.DB.Model(&Message{}).Count(&MessageId)
+	DB.Model(&Message{}).Count(&MessageId)
 	//MessageId++
 	if a_t == "1" {
 		atomic.AddInt64(&MessageId, 1)
@@ -41,7 +40,7 @@ func MessageAction(c *gin.Context) {
 			CreateTime:   time.Now().Local().Unix(), //time.Now().Format("2006-01-02 15:04:05"),
 			MKey:         K,
 		}
-		conf.DB.Model(&Message{}).Create(&m)
+		DB.Model(&Message{}).Create(&m)
 	}
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
@@ -50,11 +49,11 @@ func MessageAction(c *gin.Context) {
 }
 
 func MessageChat(c *gin.Context) {
-	conf.DB.AutoMigrate(&Message{})
+	DB.AutoMigrate(&Message{})
 	Token := c.Query("token")
 	S_Tuid := c.Query("to_user_id")
 	var u User
-	conf.DB.Table("users").Where("token = ?", Token).First(&u)
+	DB.Table("users").Where("token = ?", Token).First(&u)
 	Tuid, _ := strconv.Atoi(S_Tuid)
 	K := GetKey(u.ID, Tuid)
 	K1 := fmt.Sprintf("%d_%d", Tuid, u.ID)
@@ -63,8 +62,8 @@ func MessageChat(c *gin.Context) {
 	num, _ := M_count.Load(K1)
 	var count int
 	if num.(int) == 0 {
-		conf.DB.Model(&Message{}).Where("M_key = ?", K).Find(&MList)
-		conf.DB.Model(&Message{}).Where("M_key = ? ", K).Count(&count)
+		DB.Model(&Message{}).Where("M_key = ?", K).Find(&MList)
+		DB.Model(&Message{}).Where("M_key = ? ", K).Count(&count)
 		Num_Message.Store(K1, count)
 		fmt.Println(MList)
 		c.JSON(http.StatusOK, MessageResponse{
@@ -74,8 +73,8 @@ func MessageChat(c *gin.Context) {
 		M_count.Delete(K1)
 		M_count.Store(K1, 1)
 	} else {
-		conf.DB.Model(&Message{}).Where("M_key = ? ", K).Count(&count)
-		conf.DB.Model(&Message{}).Where("M_key = ? ", K).Last(&MList)
+		DB.Model(&Message{}).Where("M_key = ? ", K).Count(&count)
+		DB.Model(&Message{}).Where("M_key = ? ", K).Last(&MList)
 		v, _ := Num_Message.Load(K1)
 		if v.(int) != count && MList[0].To_user_id == int64(u.ID) {
 			Num_Message.Delete(K1)

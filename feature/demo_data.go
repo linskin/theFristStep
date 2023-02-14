@@ -7,7 +7,6 @@ var DemoAuthor = User{
 	FollowerCount: 9999,
 	IsFollow:      true,
 	Token:         "NSWAGP123456",
-	V_key:         3,
 }
 
 /*

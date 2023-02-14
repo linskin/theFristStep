@@ -1,10 +1,8 @@
 package feature
 
 import (
-	"context"
 	"example.com/m/v2/conf"
 	"fmt"
-	"mime/multipart"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -14,16 +12,18 @@ import (
 )
 
 func PublishList(c *gin.Context) {
+	DB.AutoMigrate(&User{}, &Video{})
+	//获取用户信息
 	Token := c.Query("token")
-	conf.DB.AutoMigrate(&User{}, &Video{})
 	var u User
-	conf.DB.Table("users").Where("token = ?", Token).First(&u)
-	fk := u.V_key
+	DB.Table("users").Where("token = ?", Token).First(&u)
+	//获取视频列表
 	var PList []Video
-	conf.DB.Table("videos").Where("uid = ?", fk).Find(&PList)
+	DB.Table("videos").Where("uid = ?", u.ID).Find(&PList)
 	for _, v := range PList {
 		v.Author = u
 	}
+
 	c.JSON(http.StatusOK, Video_Feed{
 		StatusCode: 0,
 		StatusMsg:  "string",
@@ -35,12 +35,13 @@ func PublishList(c *gin.Context) {
 func PublishAction(c *gin.Context) {
 	Token := c.PostForm("token")
 	T := c.PostForm("title")
+	//获取用户信息
 	var u User
-	result := conf.DB.Table("users").Where("Token = ?", Token).Find(&u)
+	result := DB.Table("users").Where("Token = ?", Token).Find(&u)
 	if result.Error != nil {
 		panic(result.Error)
 	}
-
+	//获取表单文件
 	V, err := c.FormFile("data")
 	if err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -64,28 +65,11 @@ func PublishAction(c *gin.Context) {
 	v := Video{Title: T,
 		PlayURL:  conf.CosUrl + saveFile,
 		CoverURL: "https://img0.baidu.com/it/u=3294539948,324399065&fm=253&fmt=auto&app=138&f=JPEG?w=822&h=500",
-		UID:      u.V_key}
-	conf.DB.Table("videos").Create(&v)
-	//if err := c.SaveUploadedFile(V, saveFile); err != nil {
-	//	c.JSON(http.StatusOK, Response{
-	//		StatusCode: 0,
-	//		StatusMsg:  err.Error(),
-	//	})
-	//	panic(err)
-	//}
+		UID:      u.ID}
+	DB.Table("videos").Create(&v)
+
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
 		StatusMsg:  finalName + "成功发布!",
 	})
-}
-
-func Upload(file *multipart.FileHeader, saveName string) error {
-	fd, err := file.Open()
-	if err != nil {
-		return err
-	}
-	if _, err = conf.Client.Object.Put(context.Background(), saveName, fd, nil); err != nil {
-		return err
-	}
-	return nil
 }
