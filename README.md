@@ -1,4 +1,4 @@
-# theFristStep
-nothing have to talk, just go go go.
+# theFristSt
+go go go.
 and then
-this just a test for something, less words I had remember, so please start issue by Chinese as well as possible.
+this just a test for something, 
